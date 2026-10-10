@@ -4,6 +4,8 @@
 \usepackage{xcolor}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 
 % ================= Palette (identique au livre Tome 1) =================
 \definecolor{PyBleu}{HTML}{1A4A7A}
@@ -202,6 +204,37 @@ AFFICHER "Aire : ", aire
 
 \end{frame}
 
+\begin{frame}{Schéma : la variable, une boîte étiquetée}
+
+\begin{center}
+\begin{tikzpicture}[
+  boite/.style={draw=PyBleu, fill=PyBleuClair, very thick,
+                minimum width=2.1cm, minimum height=1.1cm,
+                font=\large\bfseries},
+  instr/.style={font=\small\ttfamily, color=PyNuit, anchor=east},
+  etiq/.style={font=\small\bfseries, color=PyBleu},
+]
+  \node[instr] (i1) at (0, 2.0)  {longueur reçoit 8};
+  \node[instr] (i2) at (0, 0)    {largeur reçoit 5};
+  \node[instr] (i3) at (0, -2.0) {aire reçoit longueur fois largeur};
+  \node[boite] (b1) at (5.4, 2.0)  {8};
+  \node[boite] (b2) at (5.4, 0)    {5};
+  \node[boite] (b3) at (5.4, -2.0) {40};
+  \node[etiq, above=2pt of b1] {longueur};
+  \node[etiq, above=2pt of b2] {largeur};
+  \node[etiq, above=2pt of b3] {aire};
+  \draw[-{Latex}, very thick, draw=PyBleuMoyen] (i1) to (b1);
+  \draw[-{Latex}, very thick, draw=PyBleuMoyen] (i2) to (b2);
+  \draw[-{Latex}, very thick, draw=PyBleuMoyen] (i3) to (b3);
+\end{tikzpicture}
+\end{center}
+
+\vspace{6pt}
+
+{\small\color{PyGris}\itshape À gauche, l'instruction du pseudo-code ; à droite, la boîte qui reçoit la valeur. L'étiquette ne change jamais : elle sert à retrouver la boîte.}
+
+\end{frame}
+
 \begin{frame}[fragile]{Entrées, sorties et calculs}
 \begin{columns}[t]
 \begin{column}{0.42\textwidth}
@@ -227,6 +260,36 @@ AFFICHER "À payer : ", total
 \end{columns}
 \end{frame}
 
+\begin{frame}{Schéma : mettre à jour une variable}
+
+\begin{center}
+\begin{tikzpicture}[
+  boite/.style={draw=PyBleu, very thick, fill=PyBleuClair,
+                minimum width=2.6cm, minimum height=1.25cm,
+                font=\Large\bfseries},
+  etiq/.style={font=\small\bfseries, color=PyBleu},
+  leg/.style={font=\small, color=PyGris},
+]
+  \node[etiq] (e1) at (0, 1.1) {total};
+  \node[boite] (b1) at (0, 0) {4500};
+  \node[leg, below=3pt of b1] {prix = 1500, quantite = 3};
+  \node[boite, fill=PyJaune!45] (b2) at (7.6, 0) {5310};
+  \node[etiq] (e2) at (7.6, 1.1) {total};
+  \node[leg, below=3pt of b2] {après l'ajout de la TVA de 18 \%};
+  \draw[-{Latex}, very thick, draw=PyBleuMoyen]
+    (b1) to node[above, align=center, font=\small\ttfamily, color=PyNuit]
+      {total reçoit total\\ + (total fois 0.18)}
+    node[below, align=center, font=\small, color=PyGris]
+      {l'ancienne valeur est écrasée\\ et remplacée} (b2);
+\end{tikzpicture}
+\end{center}
+
+\vspace{6pt}
+
+{\small\color{PyGris}\itshape Règle d'or : une affectation écrase toujours l'ancienne valeur. La boîte « total » ne garde qu'une seule valeur à la fois.}
+
+\end{frame}
+
 \begin{frame}{Les conditions : prendre des décisions}
 \begin{itemize}
   \item Sans conditions, un programme fait toujours la même chose
@@ -250,6 +313,39 @@ FIN SI
 \vspace{0.5pt}
 
 {\small\color{PyGris}\itshape L'indentation (le décalage) montre ce qui appartient au SI et ce qui appartient au SINON.}
+
+\end{frame}
+
+\begin{frame}{Schéma : le chemin d'une condition}
+
+\begin{center}
+\begin{tikzpicture}[
+  depart/.style={draw=PyBleu, fill=PyBleuClair, thick, rounded corners=6pt,
+                 minimum width=3.4cm, minimum height=0.85cm,
+                 font=\small\ttfamily},
+  test/.style={draw=PyBleu, fill=PyJaune!40, very thick, diamond, aspect=2.4,
+               inner sep=1pt, font=\small\bfseries},
+  action/.style={draw=PyBleu, thick, minimum width=4.1cm,
+                 minimum height=0.9cm, font=\small\ttfamily},
+  lbl/.style={font=\small\bfseries},
+]
+  \node[depart] (ent) at (0, 2.5) {ENTRER note};
+  \node[test] (t) at (0, 0.5) {note $\geq$ 10 ?};
+  \node[action, fill=PyVert!12, draw=PyVert] (v) at (6.0, 0.5)
+    {AFFICHER « Admis »};
+  \node[action, fill=PyRouge!10, draw=PyRouge] (f) at (0, -1.9)
+    {AFFICHER « Ajourné »};
+  \draw[-{Latex}, very thick, draw=PyBleuMoyen] (ent) to (t);
+  \draw[-{Latex}, very thick, draw=PyVert]
+    (t) to node[lbl, above, color=PyVert] {vrai} (v);
+  \draw[-{Latex}, very thick, draw=PyRouge]
+    (t) to node[lbl, right=4pt, color=PyRouge] {faux} (f);
+\end{tikzpicture}
+\end{center}
+
+\vspace{6pt}
+
+{\small\color{PyGris}\itshape Le losange évalue le test : il produit vrai ou faux, puis une seule flèche est suivie, jamais les deux.}
 
 \end{frame}
 
