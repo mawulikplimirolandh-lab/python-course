@@ -1,0 +1,343 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 04 : Conditions et boucles en Python}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 04 : Conditions et boucles en Python},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 04\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries De l'algo au code : conditions et boucles en Python\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 7 et 8 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Traduire SI, SINON SI et SINON en if, elif et else avec la bonne indentation
+  \item Combiner des tests avec and, or et not
+  \item Écrire des boucles while et for, avec range() et les bornes exactes
+  \item Contrôler le flux avec break et continue
+  \item Reconnaître et corriger les erreurs d'indentation
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 03}
+Vous savez créer des variables et calculer : il est temps de donner au programme le pouvoir de décider et de répéter.
+
+\begin{itemize}
+  \item Types de base : int, float, str, bool et leurs conversions
+  \item Opérateurs arithmétiques : +, -, *, /, //, \%, **
+  \item Priorités : la puissance avant la multiplication avant l'addition
+  \item f-strings : interpolation et formatage \{:>10.2f\}
+  \item Toute comparaison produit un bool : True ou False
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{La syntaxe if / elif / else}
+
+\begin{lstlisting}[style=py]
+note = 13
+if note >= 16:
+    print("Très bien")
+elif note >= 10:
+    print("Passable")
+else:
+    print("Insuffisant")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Les deux points ouvrent le bloc ; le bloc est constitué de tout ce qui est indenté de 4 espaces.}
+
+\end{frame}
+
+\begin{frame}{L'indentation est la structure}
+\begin{itemize}
+  \item En pseudo-code : FIN SI ; en Python : \textbf{fin de l'indentation}
+  \item 4 espaces par niveau, jamais de mélange tabulations et espaces
+  \item Tout ce qui est indenté au même niveau appartient au même bloc
+  \item Une indentation incohérente lève `IndentationError` à l'exécution
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Les opérateurs logiques Python}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Pseudo-code} & \textbf{\color{PyBleu}Python} & \textbf{\color{PyBleu}Règle} \\
+\midrule
+ET & and & vrai si les deux côtés sont vrais \\
+OU & or & vrai si au moins un côté est vrai \\
+NON & not & inverse la valeur logique \\
+= & == & test d'égalité : deux signes ! \\
+!= & != & différent de : identique \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Priorité de lecture : not, puis and, puis or. En cas de doute, mettez des parenthèses.}
+\end{frame}
+
+\begin{frame}[fragile]{elif contre conditions imbriquées}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Chaîne elif : les cas se lisent en cascade, un seul est choisi
+  \item Imbrication : un if dans un if, utile pour des décisions à deux niveaux
+  \item Au delà de deux niveaux d'imbrication, préférez une chaîne elif
+  \item Règle : la branche la plus probable en premier quand cela compte pour la performance
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+age = 20
+carte = True
+
+if age >= 18:
+    if carte:
+        print("Accès OK")
+    else:
+        print("Carte manquante")
+else:
+    print("Trop jeune")
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{La boucle while}
+
+\begin{lstlisting}[style=py]
+compteur = 5
+while compteur > 0:
+    print(compteur)
+    compteur = compteur - 1
+print("Décollage !")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape TANT QUE se traduit mot pour mot : condition vérifiée avant chaque tour, mise à jour obligatoire dans le corps.}
+
+\end{frame}
+
+\begin{frame}[fragile]{La boucle for et range()}
+
+\begin{lstlisting}[style=py]
+for k in range(1, 11):
+    print(k, "fois 7 =", k * 7)
+
+for lettre in "Python":
+    print(lettre)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape for parcourt directement les éléments d'une suite : entiers de range(), caractères d'une str, éléments d'une list.}
+
+\end{frame}
+
+\begin{frame}{Les trois visages de range()}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Appel} & \textbf{\color{PyBleu}Valeurs produites} & \textbf{\color{PyBleu}Usage} \\
+\midrule
+range(5) & 0, 1, 2, 3, 4 & 5 tours, numérotation à partir de 0 \\
+range(1, 6) & 1, 2, 3, 4, 5 & borne de fin exclue \\
+range(10, 0, -1) & 10, 9, ... 1 & compte à rebours, pas de -1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Règle d'or : la borne de fin n'est jamais atteinte. range(a, b) produit exactement b moins a valeurs.}
+\end{frame}
+
+\begin{frame}[fragile]{break et continue}
+
+\begin{lstlisting}[style=py]
+for k in range(1, 100):
+    if k % 13 == 0:
+        print("Premier multiple de 13 :", k)
+        break
+    if k % 2 == 0:
+        continue     # passe au tour suivant
+    print("Impair :", k)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape break quitte la boucle immédiatement ; continue saute le reste du corps et enchaîne le tour suivant.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Simulation d'une devinette}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Nombre secret, essais fournis à l'avance
+  \item Boucle for sur les essais
+  \item Trop petit, trop grand ou trouvé ?
+  \item break dès la victoire
+  \item Nous remplacerons les essais par input() dans vos scripts, jamais dans un notebook
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+secret = 42
+essais = [10, 50, 40, 42]
+
+for essai in essais:
+    if essai == secret:
+        print("Trouvé :", essai)
+        break
+    elif essai < secret:
+        print(essai, "trop petit")
+    else:
+        print(essai, "trop grand")
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Les erreurs d'indentation}
+Un espace de trop dans une branche change le sens du programme sans message d'alerte logique : l'instruction se rattache alors à un autre bloc. Vérifiez systématiquement les trois zones à risque : après un if, après un for, après un while. L'éditeur compte les espaces pour vous : activez l'affichage des espaces invisibles.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 04}
+if, elif, else décident ; while et for répètent ; break et continue dirigent la boucle depuis l'intérieur. L'indentation de 4 espaces est la structure même du langage. range(a, b) compte de a à b moins 1 : récitez cette règle jusqu'à ce qu'elle devienne automatique.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Conditions et boucles en action}
+Cinq exercices qui combinent décisions et répétitions, du test le plus simple à la pyramide d'étoiles. Pour chaque exercice, annoncez vous même si vous choisissez while ou for, et pourquoi.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Signe d'un nombre
+  \item \textbf{Exercice 2 (Basique)} : FizzBuzz sur une plage
+  \item \textbf{Exercice 3 (Intermédiaire)} : Somme des nombres pairs avec while
+  \item \textbf{Exercice 4 (Intermédiaire)} : Devinette avec compteur d'essais
+  \item \textbf{Exercice 5 (Défi)} : Pyramide d'étoiles
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_04\_conditions\_et\_boucles\_python.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 05 : les listes et les tuples, puis les compréhensions de listes. Relisez les boucles imbriquées de la séance 02 : elles reviennent pour parcourir les tableaux à deux dimensions.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

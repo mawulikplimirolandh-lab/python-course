@@ -1,0 +1,350 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 03 : Variables et types}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 03 : Variables et types},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 03\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Premiers pas en Python : variables et types\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 5 et 6 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Exécuter du code Python de trois façons : interpréteur, script, notebook
+  \item Créer des variables et respecter les règles de nommage
+  \item Manipuler les quatre types de base : int, float, str et bool
+  \item Convertir proprement avec int(), float() et str()
+  \item Formater des messages lisibles avec les f-strings
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 02}
+Nous quittons le pseudo-code : les algorithmes des deux premières séances vont maintenant s'écrire en vrai Python.
+
+\begin{itemize}
+  \item Boucles POUR et TANT QUE : répéter sans recopier le code
+  \item Compteur et accumulateur : les deux schémas fondamentaux
+  \item Champion courant : minimum et maximum d'une série
+  \item Tri par sélection : boucles imbriquées et échange
+  \item Pièges : boucle infinie et décalage de un
+\end{itemize}
+\end{frame}
+\begin{frame}{Trois façons d'exécuter du Python}
+\begin{columns}[t]
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Interpréteur}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Commande `python -V` pour vérifier l'installation
+  \item Tapez `python` : chaque ligne s'exécute aussitôt
+  \item Idéal pour essayer une expression
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Script}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Code dans un fichier `.py`
+  \item Lancement : `python monfichier.py`
+  \item Idéal pour un programme complet
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Notebook}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Fichier `.ipynb` en cellules
+  \item Chaque cellule se lance seule, le résultat reste affiché
+  \item Notre format de TP : mélange d'explications et de code
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Afficher et commenter}
+
+\begin{lstlisting}[style=py]
+# Un programme Python se lit de haut en bas
+print("Bonjour !")
+print(3 + 4)
+print("3 + 4 =", 3 + 4)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le dièse ouvre un commentaire : Python l'ignore totalement, il est là pour le lecteur humain.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Variables et nommage}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Affectation : `age = 25` crée la boîte et la remplit
+  \item On peut relire et \textbf{réaffecter} : `age = age + 1`
+  \item Noms en minuscules avec des tirets bas : `prix\_total`
+  \item Interdits : espaces, accents, mots réservés (`if`, `for`...)
+  \item Un nom clair vaut dix commentaires
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+prix_total = 1500
+remise = prix_total * 0.1
+prix_total = prix_total - remise
+print(prix_total)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Les quatre types de base}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Type} & \textbf{\color{PyBleu}Contient} & \textbf{\color{PyBleu}Exemples} \\
+\midrule
+int & entiers, sans limite de taille & 0, 42, -7 \\
+float & nombres à virgule flottante & 3.14, -0.5, 1e6 \\
+str & texte entre guillemets & « bonjour », 'A', "" \\
+bool & valeurs logiques & True, False \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}La fonction type(x) révèle le type d'une expression : essayez type(3), type(3.0), type(« 3 »).}
+\end{frame}
+
+\begin{frame}[fragile]{Les opérateurs arithmétiques}
+
+\begin{lstlisting}[style=py]
+print(7 + 2, 7 - 2, 7 * 2)   # 9 5 14
+print(7 / 2)     # 3.5  division classique, toujours float
+print(7 // 2)    # 3    division entière (partie entière)
+print(7 % 2)     # 1    reste de la division entière
+print(7 ** 2)    # 49   puissance
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le quotient et le reste forment un duo : 7 = 2 fois 3 plus 1. `\%` sert pour la parité, les rotations, le découpage du temps.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Priorités et parenthèses}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Puissance avant multiplication et division
+  \item Multiplication et division avant addition et soustraction
+  \item En cas de doute : mettez des parenthèses
+  \item Les parenthèses ne coûtent rien et évitent les erreurs
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+moyenne = (12 + 15 + 9) / 3
+print(moyenne)          # 12.0
+
+sans_parentheses = 12 + 15 + 9 / 3
+print(sans_parentheses)  # 30.0 : faux !
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Conversions de types}
+\begin{itemize}
+  \item `int("12")` transforme un texte en entier ; `float("3.5")` en nombre réel
+  \item `str(42)` transforme un nombre en texte : obligatoire pour coller des chaînes autrement
+  \item `int(3.9)` \textbf{tronque} : résultat 3, sans arrondi
+  \item Une conversion impossible lève `ValueError` : `int("douze")`
+  \item Règle d'or : convertissez à la frontière, entre le monde du texte et celui des nombres
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Les f-strings : écrire proprement}
+
+\begin{lstlisting}[style=py]
+prenom = "Awa"
+note = 15.5
+print(f"{prenom} a obtenu {note} sur 20")
+print(f"Moyenne arrondie : {note:.1f}")
+print(f"Sur 3 caractères : |{note:>8.2f}|")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le f devant les guillemets active l'interpolation : les expressions entre accolades sont évaluées puis insérées.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Les booléens en action}
+
+\begin{lstlisting}[style=py]
+majeur = 19 >= 18
+print(majeur)            # True
+print(type(majeur))      # <class 'bool'>
+print(2 == 2, 2 != 2)    # True False
+print(True + True)       # 2 : True vaut 1 en calcul
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Toute comparaison produit un bool. Les connecteurs and, or et not s'appliquent aux bool, comme ET, OU, NON du pseudo-code.}
+
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{int n'est pas float n'est pas str}
+`5` et `5.0` et `"5"` sont trois valeurs différentes : le premier est un int, le deuxième un float, la troisième une str. Additionner une str et un int lève `TypeError`. Le piège classique : lire une saisie avec `input()`, qui renvoie toujours une str, et oublier de la convertir avant de calculer.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Astuce}
+\begin{exampleblock}{Explorer en direct}
+Gardez un interpréteur ouvert pendant tout le TP. Une expression vous semble étrange ? Tapez la et observez. `type()`, `int()`, `round()` et les f-strings s'apprennent en cinq essais, pas en cinq pages de lecture.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 03}
+Une variable porte un nom clair et garde une valeur typée : int, float, str ou bool. Les opérateurs `//` et `\%` découpent les entiers, `/` produit toujours un float. Les conversions se font explicitement avec int(), float() et str(). Les f-strings assemblent textes et nombres sans efforts ni erreurs.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Variables, types et formatage}
+Cinq exercices pour installer vos réflexes Python : affectations, calculs arithmétiques, conversions et f-strings. Exécutez chaque cellule après l'avoir complétée.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Carte de visite en f-string
+  \item \textbf{Exercice 2 (Basique)} : Convertisseur secondes vers h:m:s
+  \item \textbf{Exercice 3 (Intermédiaire)} : Prix TTC avec arrondi
+  \item \textbf{Exercice 4 (Intermédiaire)} : Échange de variables et alignement
+  \item \textbf{Exercice 5 (Défi)} : Rendre la monnaie en FCFA
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_03\_variables\_et\_types.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 04 : conditions et boucles en Python. Le pseudo-code des séances 01 et 02 va prendre sa forme définitive : if, elif, else, while, for, range, break et continue. Refaites l'exercice de la monnaie en expliquant chaque ligne à voix haute : c'est le meilleur entraînement.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

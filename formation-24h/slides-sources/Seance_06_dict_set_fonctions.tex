@@ -1,0 +1,359 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 06 : Dict, set et fonctions}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 06 : Dict, set et fonctions},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 06\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Organiser ses données et son code : dict, set et fonctions\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 11 et 12 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Créer et manipuler des dictionnaires : clés, valeurs, get et .items()
+  \item Compter et regrouper des données avec un dictionnaire
+  \item Utiliser les ensembles pour l'unicité et les opérations ensemblistes
+  \item Écrire des fonctions avec paramètres, valeurs par défaut et return
+  \item Documenter une fonction avec une docstring et choisir la bonne structure
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 05}
+Les listes rangent par position. Quand la position n'a pas de sens, il faut une autre organisation : l'accès par clé.
+
+\begin{itemize}
+  \item Index, slices, méthodes append, insert, remove, pop
+  \item Tuples : immuables, parfaits pour retourner plusieurs valeurs
+  \item Compréhensions : simple, filtrée, imbriquée
+  \item Piège : affecter une liste ne la copie pas
+  \item enumerate pour parcourir avec la position
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Le dictionnaire : accès par clé}
+
+\begin{lstlisting}[style=py]
+eleve = {"nom": "Awa", "age": 21}
+print(eleve["nom"])            # Awa
+eleve["filiere"] = "Maths"     # ajout
+eleve["age"] = 22              # modification
+print("nom" in eleve)          # True
+print(eleve.get("tel"))        # None : pas d'erreur !
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Clé entre crochets : lecture et écriture. get(key) renvoie None au lieu de lever KeyError quand la clé manque.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Parcourir un dictionnaire}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item `.keys()` : les clés (le parcours direct fait pareil)
+  \item `.values()` : les valeurs seules
+  \item `.items()` : les paires (clé, valeur), dépliées par l'unpacking
+  \item Les dictionnaires conservent l'ordre d'insertion depuis Python 3.7
+  \item Les clés sont uniques : réaffecter remplace la valeur
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+stocks = {"riz": 50, "huile": 12}
+
+for cle in stocks:
+    print(cle, stocks[cle])
+
+for cle, valeur in stocks.items():
+    print(f"{cle:<8} : {valeur:>3} sacs")
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Compter avec un dictionnaire}
+
+\begin{lstlisting}[style=py]
+mots = ["riz", "mais", "riz", "yam", "mais", "riz"]
+compteur = {}
+for mot in mots:
+    if mot in compteur:
+        compteur[mot] += 1
+    else:
+        compteur[mot] = 1
+print(compteur)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le schéma de comptage : si la clé existe, incrémenter ; sinon, créer à 1. La méthode setdefault ou .get(k, 0) + 1 condense ce code.}
+
+\end{frame}
+
+\begin{frame}[fragile]{L'ensemble : unicité garantie}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Création : `set([1, 2, 2, 3])` donne \{1, 2, 3\}
+  \item Aucun doublon, aucun ordre garanti
+  \item `in` est \textbf{très rapide}, même sur de gros ensembles
+  \item union `|`, intersection `\&`, différence `-`
+  \item Usage typique : dédoublonner une liste
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+inscrits = ["awa", "kofi", "awa", "sena"]
+uniques = set(inscrits)
+print(uniques)
+
+a = {1, 2, 3}
+b = {2, 3, 4}
+print(a | b)   # {1, 2, 3, 4}
+print(a & b)   # {2, 3}
+print(a - b)   # {1}
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Quelle structure choisir ?}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Structure} & \textbf{\color{PyBleu}Quand l'utiliser} & \textbf{\color{PyBleu}Exemple} \\
+\midrule
+list & série ordonnée, modifiable & file d'attente, notes \\
+tuple & groupe figé de valeurs & coordonnées, retour multiple \\
+dict & accès par clé signifiante & fiche élève, inventaire \\
+set & unicité et appartenance rapide & dédoublonner, tags \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Règle pratique : la position compte ? list. Le nom compte ? dict. Le doublon interdit ? set.}
+\end{frame}
+
+\begin{frame}[fragile]{Définir une fonction}
+
+\begin{lstlisting}[style=py]
+def aire_rectangle(longueur, largeur):
+    """Retourne l'aire d'un rectangle."""
+    return longueur * largeur
+
+resultat = aire_rectangle(8, 5)
+print(resultat)   # 40
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape def lance la définition, la docstring documente, return rend la valeur. Une fonction sans return rend None.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Paramètres : ordre, défauts, mots clés}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item L'ordre des arguments positionnels compte
+  \item Un paramètre avec défaut devient \textbf{facultatif}
+  \item Les arguments par mots clés rendent l'appel explicite
+  \item Les valeurs par défaut sont évaluées \textbf{une seule fois}
+  \item Jamais de liste mutable en défaut (piège du Tome 1)
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+def prix_ttc(hors_taxe, taux=0.18, remise=0):
+    net = hors_taxe * (1 + taux)
+    return round(net * (1 - remise), 2)
+
+print(prix_ttc(100))
+print(prix_ttc(100, taux=0.075))
+print(prix_ttc(100, remise=0.1, taux=0.075))
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Portée : locale par défaut}
+
+\begin{lstlisting}[style=py]
+total_global = 1000     # variable globale
+
+def ajouter(montant):
+    part_locale = montant      # locale à la fonction
+    return part_locale
+
+print(ajouter(50))
+print(total_global)
+# print(part_locale)  -> NameError : hors de la fonction
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Une variable créée dans une fonction disparaît à la sortie. Une fonction lit les globales mais doit les éviter : passez tout en paramètres.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Retourner plusieurs valeurs}
+
+\begin{lstlisting}[style=py]
+def min_max_moy(notes):
+    """Retourne (minimum, maximum, moyenne) d'une série."""
+    return (min(notes), max(notes),
+            round(sum(notes) / len(notes), 2))
+
+mini, maxi, moy = min_max_moy([12, 15, 9, 18])
+print(mini, maxi, moy)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le tuple retourné se déplie en trois variables à l'appel : c'est le idiome standard du calcul de statistiques.}
+
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{KeyError : la clé fantôme}
+`eleve["tel"]` lève `KeyError` si la clé n'existe pas. Deux parades : `.get("tel")` qui renvoie None, ou le test `"tel" in eleve` avant l'accès. Choisissez selon l'intention : get quand l'absence est normale, in quand l'absence est une anomalie à signaler.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 06}
+Le dictionnaire relie une clé à une valeur et se parcourt avec .items() ; l'ensemble garantit l'unicité et teste l'appartenance en un éclair. La structure se choisit selon la question posée : position, nom ou unicité. La fonction encapsule un calcul derrière un nom clair, documenté par une docstring, avec des paramètres explicites : c'est la brique de base de tout gros programme.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Dictionnaires, ensembles et fonctions}
+Cinq exercices pour organiser les données puis le code : fiche contact, comptage, validation, statistiques et un mini quiz complet. Les fonctions des exercices 3 à 5 doivent avoir une docstring d'une ligne.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Fiche contact
+  \item \textbf{Exercice 2 (Basique)} : Compteur d'occurrences
+  \item \textbf{Exercice 3 (Intermédiaire)} : Validation d'adresse e-mail
+  \item \textbf{Exercice 4 (Intermédiaire)} : Statistiques de notes en dictionnaire
+  \item \textbf{Exercice 5 (Défi)} : Mini quiz en fonctions
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_06\_dict\_set\_fonctions.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 07 : fonctions avancées (closures et décorateurs), puis chaînes et fichiers. Relisez la portée locale et globale de cette séance : la closure est exactement une fonction qui garde en mémoire la portée où elle est née.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

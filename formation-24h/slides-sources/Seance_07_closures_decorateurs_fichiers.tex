@@ -1,0 +1,366 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 07 : Closures, chaînes et fichiers}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 07 : Closures, chaînes et fichiers},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 07\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Fonctions avancées : closures, décorateurs, chaînes et fichiers\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 13 et 14 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Comprendre la portée LEGB et l'imbrication de fonctions
+  \item Écrire des closures : des fonctions qui gardent en mémoire leur contexte
+  \item Comprendre et écrire un décorateur avec @
+  \item Maîtriser les méthodes essentielles des chaînes : strip, lower, split, join
+  \item Lire et écrire des fichiers proprement avec with open
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 06}
+Une fonction est un objet comme un autre : on peut la retourner, la passer en paramètre et même la fabriquer à la chaîne. C'est la clé des closures.
+
+\begin{itemize}
+  \item Dict : accès par clé, .items(), schéma de comptage
+  \item Set : unicité, appartenance rapide, union et intersection
+  \item Fonctions : def, paramètres, valeurs par défaut, return
+  \item Portée : une variable créée dans une fonction disparaît à la sortie
+  \item Choisir la structure : position ? list. Nom ? dict. Unicité ? set
+\end{itemize}
+\end{frame}
+\begin{frame}{La règle LEGB : où Python cherche un nom}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Niveau} & \textbf{\color{PyBleu}Signification} & \textbf{\color{PyBleu}Durée de vie} \\
+\midrule
+L & Local : dans la fonction courante & à chaque appel \\
+E & Englobante : la fonction qui contient & tant que la closure vit \\
+G & Globale : au niveau du module & toute l'exécution \\
+B & Built in : print, len, sum... & toujours \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Python cherche de bas en haut et s'arrête au premier nom trouvé. Une affectation crée un nom LOCAL, sauf déclaration nonlocal ou global.}
+\end{frame}
+
+\begin{frame}[fragile]{Fonctions imbriquées}
+
+\begin{lstlisting}[style=py]
+def exterior(x):
+    def interieur(y):
+        return x + y      # x vient de la portée englobante
+    return interieur
+
+ajoute_10 = exterior(10)
+print(ajoute_10(5))       # 15
+print(ajoute_10(32))      # 42
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape La fonction interne peut lire les variables de la fonction externe. Retourner `interieur` exporte la fonction, avec son souvenir de x.}
+
+\end{frame}
+
+\begin{frame}{La closure : la fonction à mémoire}
+\begin{itemize}
+  \item Une \textbf{closure} est une fonction interne retournée qui \textbf{conserve} les variables de sa portée de naissance
+  \item Chaque appel de la fabrique crée une closure \textbf{indépendante}
+  \item `ajoute\_10.\_\_closure\_\_` révèle la valeur retenue
+  \item Usage : fabriques de fonctions configurées, compteurs, caches
+  \item C'est le socle des décorateurs, vus dans trois diapositives
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Fabrique de multiplicateurs}
+
+\begin{lstlisting}[style=py]
+def fabrique_multiplicateur(factor):
+    def multiplier(valeur):
+        return valeur * factor   # factor est retenu
+    return multiplier
+
+double = fabrique_multiplicateur(2)
+triple = fabrique_multiplicateur(3)
+print(double(7), triple(7))   # 14 21
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape double et triple sont deux closures distinctes : chacune a retenu son propre factor. Changer double ne touche pas triple.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Modifier la variable englobante : nonlocal}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Lire la variable englobante : automatique
+  \item La \textbf{réaffecter} : il faut déclarer `nonlocal compteur`
+  \item Sans nonlocal, l'affectation créerait une variable locale de même nom
+  \item Schéma classique : le compteur vit dans la closure, personne d'autre ne peut y toucher
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+def fabrique_compteur():
+    compteur = 0
+    def incrementer():
+        nonlocal compteur
+        compteur += 1
+        return compteur
+    return incrementer
+
+prochain = fabrique_compteur()
+print(prochain(), prochain(), prochain())
+print(prochain.__closure__[0].cell_contents)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Le décorateur : une closure appliquée}
+
+\begin{lstlisting}[style=py]
+def majuscules(fonction):
+    def emballage(*args, **kwargs):
+        resultat = fonction(*args, **kwargs)
+        return resultat.upper()
+    return emballage
+
+@majuscules
+def salutation(nom):
+    return f"bonjour {nom}"
+
+print(salutation("Awa"))   # BONJOUR AWA
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape @majuscules est un raccourci pour : salutation = majuscules(salutation). La fonction d'origine vit toujours, emballée.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Préserver l'identité : functools.wraps}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Après emballage, `salutation.\_\_name\_\_` vaudrait « emballage »
+  \item @wraps(fonction) recopie nom, docstring et métadonnées
+  \item Indispensable pour le débogage et la documentation
+  \item Les arguments *args et **kwargs rendent le décorateur universel
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+from functools import wraps
+
+def compte_appels(fonction):
+    @wraps(fonction)
+    def emballage(*args, **kwargs):
+        emballage.appels += 1
+        return fonction(*args, **kwargs)
+    emballage.appels = 0
+    return emballage
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Les méthodes des chaînes}
+
+\begin{lstlisting}[style=py]
+phrase = "  Bonjour la Classe  "
+print(phrase.strip())            # retire les espaces aux bords
+print(phrase.strip().lower())    # tout en minuscules
+mots = "riz,yam,huile".split(",")
+print(mots)                      # ['riz', 'yam', 'huile']
+print(" + ".join(mots))          # riz + yam + huile
+print("abc".replace("a", "X"))   # Xbc
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Les chaînes sont immuables : chaque méthode retourne une NOUVELLE chaîne. Enchaînez les comme des filtres : phrase.strip().lower().split().}
+
+\end{frame}
+
+\begin{frame}[fragile]{Fichiers : la règle with open}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item `open(nom, mode)` ouvre : « r » lire, « w » écrire en écrasant, « a » ajouter à la fin
+  \item \textbf{with} ferme le fichier même en cas d'erreur : jamais de fichier oublié
+  \item `.read()` lit tout, `.readlines()` une liste de lignes, boucler lit ligne à ligne
+  \item Chaque ligne lue se termine par \textbackslash\{\}n : `strip()` la nettoie
+  \item On détaillera les erreurs de fichier à la séance 11
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+with open("notes.txt", "w") as f:
+    f.write("12\n15\n9\n")
+
+with open("notes.txt", "r") as f:
+    total = 0
+    for ligne in f:
+        total += int(ligne.strip())
+print(total)   # 36
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Astuce}
+\begin{exampleblock}{Explorateur de closure}
+Après avoir créé une closure, inspectez la : `ma\_fonction.\_\_closure\_\_` est un tuple de cellules, et `.cell\_contents` montre la valeur retenue. Ce microscope rend concret un concept souvent abstrait : la fonction garde bien une boîte avec la variable dedans.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{w écrase, a ajoute}
+Ouvrir un fichier en mode « w » efface immédiatement tout son contenu, avant même la première écriture. Pour enrichir un journal au fil des jours, utilisez « a ». Et rappelez vous que les chaînes sont immuables : `phrase.upper()` ne modifie rien si vous n'affectez pas le résultat.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 07}
+LEGB régit la recherche des noms ; la closure retient la portée englobante et nonlocal autorise sa modification ; le décorateur enveloppe une fonction pour lui ajouter un comportement. Les chaînes se traitent par chaînage de méthodes immuables. Les fichiers se manipulent toujours avec with open : lire, écrire, ajouter.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Closures, décorateurs, chaînes et fichiers}
+Cinq exercices qui font dialoguer fonctions avancées et données textuelles. Le dernier exercice écrit réellement un fichier sur le disque, puis le supprime proprement.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Nettoyage de chaîne
+  \item \textbf{Exercice 2 (Basique)} : Palindrome
+  \item \textbf{Exercice 3 (Intermédiaire)} : Fabrique de puissances (closure)
+  \item \textbf{Exercice 4 (Intermédiaire)} : Décorateur compteur d'appels
+  \item \textbf{Exercice 5 (Défi)} : Journal de bord dans un fichier
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_07\_closures\_decorateurs\_fichiers.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 08 : la programmation orientée objet. Tout ce que vous avez écrit jusqu'ici était procédural ; nous allons ranger données et comportements dans des classes. Relisez le schéma de comptage : la classe Compte en aura besoin pour son historique.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

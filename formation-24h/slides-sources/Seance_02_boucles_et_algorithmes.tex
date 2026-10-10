@@ -1,0 +1,351 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 02 : Boucles et algorithmes}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 02 : Boucles et algorithmes},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 02\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Répéter sans se répéter : boucles et algorithmes\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 3 et 4 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Choisir entre la boucle TANT QUE et la boucle POUR selon la situation
+  \item Utiliser un compteur et un accumulateur pour compter et additionner
+  \item Écrire des boucles imbriquées pour traiter des tableaux à deux dimensions
+  \item Implémenter la recherche du minimum, du maximum et le tri par sélection
+  \item Identifier les deux pièges majeurs : la boucle infinie et le décalage de un
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 01}
+Avant de répéter, revoyons les briques que vous maîtrisez déjà : elles seront utilisées à l'intérieur de chaque boucle.
+
+\begin{itemize}
+  \item Variables et affectation : une boîte étiquetée qui garde une valeur
+  \item ENTRER et AFFICHER : dialoguer avec l'utilisateur
+  \item Structures SI, SINON, SINON SI : choisir un chemin
+  \item Opérateurs de test et connecteurs ET, OU, NON
+  \item Méthode : analyser, décrire en pseudo-code, tester à la main
+\end{itemize}
+\end{frame}
+\begin{frame}{Pourquoi répéter ?}
+\begin{itemize}
+  \item Afficher la table de 7 : dix instructions identiques ? Inacceptable
+  \item Additionner 200 notes à la main : source d'erreurs garantie
+  \item La boucle répète un bloc d'instructions \textbf{sans recopier le code}
+  \item Deux outils selon la situation : \textbf{TANT QUE} (tant qu'il faut) et \textbf{POUR} (un nombre connu de fois)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{La boucle TANT QUE}
+
+\begin{lstlisting}[style=py]
+ALGO CompteARebours
+compteur reçoit 5
+TANT QUE compteur > 0 FAIRE
+    AFFICHER compteur
+    compteur reçoit compteur moins 1
+FIN TANT QUE
+AFFICHER "Décollage !"
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Trois ingrédients : initialisation avant la boucle, condition de poursuite, mise à jour à l'intérieur.}
+
+\end{frame}
+
+\begin{frame}[fragile]{La boucle POUR}
+
+\begin{lstlisting}[style=py]
+ALGO TableDe7
+POUR k ALLANT DE 1 A 10 FAIRE
+    AFFICHER k, " fois 7 = ", k fois 7
+FIN POUR
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Quand le nombre de répétitions est connu d'avance, POUR est plus clair que TANT QUE.}
+
+\end{frame}
+
+\begin{frame}{Choisir la bonne boucle}
+\begin{columns}[t]
+\begin{column}{0.48\textwidth}
+{\bfseries\color{PyBleu}POUR}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Nombre de tours \textbf{connu} à l'avance
+  \item Parcours d'une suite ou d'un tableau
+  \item Le compteur est géré automatiquement
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.48\textwidth}
+{\bfseries\color{PyBleu}TANT QUE}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Nombre de tours \textbf{inconnu} à l'avance
+  \item Arrêt dicté par une condition
+  \item Attention : la condition doit finir par devenir fausse
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Compteur et accumulateur}
+
+\begin{lstlisting}[style=py]
+ALGO MoyenneDe10Notes
+somme reçoit 0
+POUR i ALLANT DE 1 A 10 FAIRE
+    ENTRER note
+    somme reçoit somme + note
+FIN POUR
+moyenne reçoit somme / 10
+AFFICHER "Moyenne : ", moyenne
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape L'accumulateur `somme` démarre à 0 et grossit d'un terme à chaque tour : schéma à retenir toute l'année.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Minimum et maximum d'une série}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Idée : garder le champion courant dans une variable
+  \item Au premier élément, le champion est ce premier élément
+  \item Chaque nouvel élément remplace le champion s'il est plus petit (ou plus grand)
+  \item Ne jamais initialiser à 0 : une série de notes négatives donnerait un faux maximum
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+ALGO MaximumDeLaSerie
+ENTRER n          # combien de valeurs
+ENTRER premier
+maxi reçoit premier
+POUR i DE 2 A n FAIRE
+    ENTRER valeur
+    SI valeur > maxi ALORS
+        maxi reçoit valeur
+    FIN SI
+FIN POUR
+AFFICHER "Maximum : ", maxi
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Boucles imbriquées}
+
+\begin{lstlisting}[style=py]
+ALGO GrilleDeProduits
+POUR ligne ALLANT DE 1 A 3 FAIRE
+    POUR colonne ALLANT DE 1 A 4 FAIRE
+        AFFICHER ligne, colonne
+    FIN POUR
+FIN POUR
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Pour chaque tour de la boucle externe, la boucle interne exécute sa propre boucle complète : 3 fois 4 tours au total.}
+
+\end{frame}
+
+\begin{frame}{Recherche dans un tableau}
+\begin{itemize}
+  \item Problème : la valeur v figure t elle dans la liste ?
+  \item Parcourir les éléments un à un et \textbf{sortir dès la première rencontre}
+  \item Si la boucle se termine sans trouver, la réponse est : absent
+  \item Complexité : au pire n comparaisons pour n éléments
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Recherche avec témoin}
+
+\begin{lstlisting}[style=py]
+ALGO RechercheDeV
+trouve reçoit faux
+POUR i ALLANT DE 1 A n FAIRE
+    SI tableau[i] = v ALORS
+        trouve reçoit vrai
+    FIN SI
+FIN POUR
+SI trouve = vrai ALORS
+    AFFICHER "Présent"
+SINON
+    AFFICHER "Absent"
+FIN SI
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le témoin `trouve` évite d'afficher plusieurs fois le même résultat et reste simple à traduire.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Tri par sélection : l'idée}
+
+\begin{lstlisting}[style=py]
+ALGO TriParSelection
+POUR i ALLANT DE 1 A n moins 1 FAIRE
+    posMini reçoit i
+    POUR j ALLANT DE i + 1 A n FAIRE
+        SI tableau[j] < tableau[posMini] ALORS
+            posMini reçoit j
+        FIN SI
+    FIN POUR
+    échanger tableau[i] et tableau[posMini]
+FIN POUR
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape On cherche le plus petit élément restant et on le place à sa position définitive, tour après tour.}
+
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Les deux pièges classiques}
+La boucle infinie : si la variable de la condition n'est jamais mise à jour, le TANT QUE ne s'arrête jamais. Le décalage de un : de 1 à n fait n tours, de 0 à n en fait n + 1 ; décidez toujours explicitement des bornes. Dans les deux cas, exécutez la boucle à la main sur un petit exemple avec trois tours.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 02}
+POUR quand on compte, TANT QUE quand on attend un événement. Le schéma accumulateur (somme qui démarre à 0) et le schéma champion courant (maximum initialisé au premier élément) reviennent dans tous les algorithmes. Le tri par sélection combine boucles imbriquées et échange : apprenez à le dérouler à la main, c'est le meilleur moyen de comprendre toutes les boucles.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Boucles et algorithmes classiques}
+Cinq exercices pour muscler vos boucles : comptage, accumulation, test de primalité et un tri complet. Écrivez d'abord la logique en pseudo-code pour les exercices 3 à 5, puis codez.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Table de multiplication
+  \item \textbf{Exercice 2 (Basique)} : Somme et moyenne d'une série
+  \item \textbf{Exercice 3 (Intermédiaire)} : Factorielle
+  \item \textbf{Exercice 4 (Intermédiaire)} : Nombre premier
+  \item \textbf{Exercice 5 (Défi)} : Tri par sélection pas à pas
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_02\_boucles\_et\_algorithmes.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 03 : premiers pas concrets en Python. Nous installerons nos habitudes d'interpréteur, découvrirons les types int, float, str et bool, les conversions et les f-strings. Refaites la table de 7 avec un print par ligne pour vous échauffer.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

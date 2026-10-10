@@ -1,0 +1,385 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 09 : Héritage et méthodes spéciales}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 09 : Héritage et méthodes spéciales},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 09\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Héritage, polymorphisme et méthodes spéciales\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 17 et 18 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Faire hériter une classe d'une autre et étendre \_\_init\_\_ avec super()
+  \item Redéfinir des méthodes et exploiter le polymorphisme
+  \item Choisir entre héritage (EST UN) et composition (A UN)
+  \item Implémenter \_\_repr\_\_, \_\_eq\_\_, \_\_add\_\_, \_\_len\_\_ et \_\_getitem\_\_
+  \item Comprendre l'ordre MRO en cas d'héritage multiple
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 08}
+Vos classes savent naître, se protéger et se présenter : elles vont maintenant se transmettre des comportements et dialoguer avec les opérateurs de Python.
+
+\begin{itemize}
+  \item \_\_init\_\_ et self : la naissance et l'identité de l'instance
+  \item Attributs d'instance contre attributs de classe partagés
+  \item Encapsulation : \_interne, \_\_privé, @property avec validation
+  \item @classmethod pour les fabriques, @staticmethod pour les utilitaires
+  \item \_\_str\_\_ : la première méthode spéciale rencontrée
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{L'héritage : réutiliser sans recopier}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item class Voiture(Vehicule) : Voiture \textbf{hérite} de tout Vehicule
+  \item Voiture est un Vehicule spécialisé : relation \textbf{EST UN}
+  \item Les méthodes héritées fonctionnent sans être réécrites
+  \item On peut \textbf{redéfinir} une méthode pour la spécialiser
+  \item super() appelle la version de la classe parente
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+class Vehicule:
+    def __init__(self, marque):
+        self.marque = marque
+    def klaxon(self):
+        return "Tut tut"
+
+class Voiture(Vehicule):
+    def klaxon(self):
+        return "Pouet pouet"
+
+v = Voiture("Toyota")
+print(v.marque, v.klaxon())
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{super().\_\_init\_\_() : étendre sans casser}
+
+\begin{lstlisting}[style=py]
+class Vehicule:
+    def __init__(self, marque, roues):
+        self.marque = marque
+        self.roues = roues
+
+class Moto(Vehicule):
+    def __init__(self, marque, cylindree):
+        super().__init__(marque, roues=2)
+        self.cylindree = cylindree
+
+m = Moto("Yamaha", 600)
+print(m.marque, m.roues, m.cylindree)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape super() délègue au parent la partie commune, puis Moto ajoute la sienne : zéro duplication du code d'initialisation.}
+
+\end{frame}
+
+\begin{frame}{Polymorphisme : même appel, comportements variés}
+\begin{itemize}
+  \item Une boucle peut appeler la même méthode sur des objets de classes différentes
+  \item Chaque classe répond à sa façon : c'est le \textbf{polymorphisme}
+  \item isinstance(x, Classe) teste la filiation en respectant l'héritage
+  \item Le code appelant ne connaît que le contrat : `forme.aire()`
+  \item Ajouter une nouvelle forme ne modifie \textbf{aucune} ligne du code appelant
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{isinstance : tester la filiation}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item `isinstance(x, Vehicule)` vaut True pour x Vehicule OU x Voiture
+  \item L'héritage traverse le test : une fille EST UN parent
+  \item Attention : trop de isinstance, c'est du code procédural déguisé
+  \item Préférez le polymorphisme : appelez la méthode, la classe répond
+  \item isinstance reste légitime aux frontières : validation, sérialisation
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+formes = [Cercle(1), Rectangle(2, 3)]
+
+for forme in formes:
+    print(isinstance(forme, Forme))
+
+# le polymorphisme remplace les tests :
+total = sum(f.aire() for f in formes)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Composition : la relation A UN}
+
+\begin{lstlisting}[style=py]
+class Moteur:
+    def __init__(self, puissance):
+        self.puissance = puissance
+
+class Voiture:                    # sans héritage !
+    def __init__(self, marque, puissance):
+        self.marque = marque
+        self.moteur = Moteur(puissance)   # A UN moteur
+
+v = Voiture("Toyota", 120)
+print(v.moteur.puissance)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Une Voiture n'est pas un Moteur : elle en possède un. Héritage pour EST UN, composition pour A UN : la question à se poser avant chaque classe.}
+
+\end{frame}
+
+\begin{frame}[fragile]{\_\_repr\_\_ et \_\_str\_\_ : deux vitrines}
+
+\begin{lstlisting}[style=py]
+class Duree:
+    def __init__(self, heures, minutes):
+        self.total = heures * 60 + minutes
+
+    def __str__(self):
+        return f"{self.total // 60} h {self.total % 60:02d}"
+
+    def __repr__(self):
+        return f"Duree({self.total // 60}, {self.total % 60})"
+
+print(Duree(1, 90))        # 2 h 30
+print([Duree(1, 90)])      # [Duree(2, 30)]
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape \_\_str\_\_ pour l'utilisateur final (print), \_\_repr\_\_ pour le développeur (console, listes, débogueur). Un \_\_repr\_\_ honnête montre comment recréer l'objet.}
+
+\end{frame}
+
+\begin{frame}[fragile]{\_\_eq\_\_ et \_\_lt\_\_ : comparer}
+
+\begin{lstlisting}[style=py]
+class Duree:
+    def __init__(self, heures, minutes=0):
+        self.total = heures * 60 + minutes
+
+    def __eq__(self, autre):
+        return self.total == autre.total
+
+    def __lt__(self, autre):
+        return self.total < autre.total
+
+print(Duree(1, 90) == Duree(2, 30))   # True
+print(sorted([Duree(2, 0), Duree(1, 0)]))
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Définir \_\_eq\_\_ rend == correct ; définir \_\_lt\_\_ suffit à sorted() pour trier les objets.}
+
+\end{frame}
+
+\begin{frame}[fragile]{\_\_len\_\_ et \_\_getitem\_\_ : se comporter comme une liste}
+
+\begin{lstlisting}[style=py]
+class Playlist:
+    def __init__(self, titres):
+        self.titres = list(titres)
+
+    def __len__(self):
+        return len(self.titres)
+
+    def __getitem__(self, index):
+        return self.titres[index]
+
+p = Playlist(["Awa", "Kofi"])
+print(len(p))        # 2
+print(p[0], p[-1])   # Awa Kofi
+for titre in p:      # le for marche aussi !
+    print(titre)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape len() appelle \_\_len\_\_, les crochets appellent \_\_getitem\_\_ : une classe qui implémente ces deux méthodes devient iterable et indexable gratuitement.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Héritage multiple et MRO}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Une classe peut hériter de plusieurs parents : class C(A, B)
+  \item Python résout un nom en remontant les parents dans un ordre précis
+  \item Cet ordre est le \textbf{MRO} : Method Resolution Order
+  \item C.\_\_mro\_\_ révèle la chaîne de recherche
+  \item Les mixins offrent des comportements optionnels par héritage multiple léger
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+class Rechargeable:
+    def recharger(self):
+        return "batterie pleine"
+
+class Roule:
+    def rouler(self):
+        return "je roule"
+
+class Trottinette(Rechargeable, Roule):
+    pass
+
+t = Trottinette()
+print(t.recharger(), t.rouler())
+print(Trottinette.__mro__)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Le MRO et le diamant}
+En héritage multiple, deux parents peuvent définir la même méthode : c'est le premier de la liste \_\_mro\_\_ qui gagne, pas le plus « logique ». Évitez les hiérarchies en diamant tant que le MRO n'est pas limpide pour vous, et préférez la composition quand l'héritage n'exprime pas clairement EST UN.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 09}
+L'héritage exprime EST UN et se complète par super() ; la composition exprime A UN et reste souvent plus souple. Le polymorphisme fait parler chaque classe avec sa voix. Les méthodes spéciales (\_\_repr\_\_, \_\_eq\_\_, \_\_lt\_\_, \_\_len\_\_, \_\_getitem\_\_) branchent vos objets sur le langage lui même : print, ==, sorted, len et les crochets.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Héritage et méthodes spéciales}
+Cinq exercices pour brancher vos classes sur le langage. L'exercice 5 construit une petite bibliothèque de médias complète : gardez la, elle inspire le mini projet de la séance 10.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Vehicule et Voiture
+  \item \textbf{Exercice 2 (Basique)} : \_\_str\_\_ et \_\_repr\_\_ sur Media
+  \item \textbf{Exercice 3 (Intermédiaire)} : Formes polymorphes
+  \item \textbf{Exercice 4 (Intermédiaire)} : Classe Duree avec \_\_add\_\_ et \_\_eq\_\_
+  \item \textbf{Exercice 5 (Défi)} : Bibliothèque de médias indexable
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_09\_heritage\_et\_methodes\_speciales.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 10 : le mini projet bancaire. Nous allons assembler trois classes qui se parlent, avec historique et validations. Relisez CompteSimple de la séance 08 : c'est son jumeau évolué qui ouvre le TP.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,383 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 12 : Débogage et synthèse}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 12 : Débogage et synthèse},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 12\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Débogage et synthèse finale\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitre 21 et annexe du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Appliquer la méthode de débogage en quatre temps
+  \item Instrumenter un code avec print(\{x=\}) et assert
+  \item Connaître les commandes de base de breakpoint() / pdb
+  \item Reconnaître les six pièges classiques du débutant
+  \item Faire le bilan des douze séances et se préparer au Tome 2
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 11}
+Dernière séance : nous consolidons tout le parcours, des premières conditions aux exceptions, et nous apprenons à chasser la plus sournoise des erreurs : l'erreur logique.
+
+\begin{itemize}
+  \item Trois familles : syntaxe, exécution, logique
+  \item Traceback : se lit de bas en haut, la dernière ligne nomme l'exception
+  \item try, except, else, finally : le protocole complet
+  \item raise et exceptions personnalisées : nommer les règles métier
+  \item EAFP : agir puis réparer, l'idiome Python
+\end{itemize}
+\end{frame}
+\begin{frame}{La méthode en quatre temps}
+\begin{columns}[t]
+\begin{column}{0.235\textwidth}
+{\bfseries\color{PyBleu}1. Reproduire}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Rendre l'erreur régulière
+  \item Trouver le plus petit jeu de données qui plante
+  \item Une erreur qu'on ne reproduit pas ne se corrige pas
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.235\textwidth}
+{\bfseries\color{PyBleu}2. Localiser}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Traceback pour les plantages
+  \item print(\{x=\}) pour les faux résultats
+  \item Diviser le code en zones de doute
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.235\textwidth}
+{\bfseries\color{PyBleu}3. Corriger}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item La plus petite modification possible
+  \item Un bug corrigé, une fois
+  \item Jamais trois correctifs en même temps
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.235\textwidth}
+{\bfseries\color{PyBleu}4. Vérifier}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Le cas qui plantait passe
+  \item Les autres cas passent encore
+  \item Un assert protège l'avenir
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{print instrumenté : \{x=\}}
+
+\begin{lstlisting}[style=py]
+def moyenne_ponderee(notes, coeffs):
+    total = 0
+    poids = 0
+    for note, coef in zip(notes, coeffs):
+        total += note * coef
+        poids += coef
+    print(f"{notes=} {coeffs=} {total=} {poids=}")
+    return total / poids
+
+moyenne_ponderee([12, 15], [1, 2])
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le f-string \{x=\} affiche le nom ET la valeur : x=12. Un print de plus en haut, un en bas, et la zone de doute se réduit en deux exécutions.}
+
+\end{frame}
+
+\begin{frame}[fragile]{assert : un contrôle qui parle}
+
+\begin{lstlisting}[style=py]
+def normaliser(note):
+    if note < 0:
+        note = 0
+    return note
+
+assert normaliser(-5) == 0, "note négative ramenée à zéro"
+assert normaliser(15) == 15, "note correcte inchangée"
+print("Les deux règles tiennent")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape assert(condition, message) : si la condition est fausse, AssertionError avec le message. Pour VERIFIER, pas pour VALIDER : la séance 11 traitait la validation.}
+
+\end{frame}
+
+\begin{frame}[fragile]{breakpoint() : le microscope}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Insérez breakpoint() là où le doute vit
+  \item L'exécution se fige et ouvre pdb en console
+  \item Commandes clés : p variable, n (suivant), s (entrer), c (continuer), q (quitter)
+  \item Vous inspectez l'état réel, pas une supposition
+  \item Dans un notebook, préférez print ; pdb brille dans un script
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+def calcul_mystere(valeurs):
+    total = 0
+    for v in valeurs:
+        breakpoint()   # l'exécution se fige ici
+        total += v
+    return total
+# p valeurs  -> la liste
+# p total    -> l'accumulateur
+# n          -> tour suivant
+# c          -> reprendre
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{pdb dans le terminal}
+
+\begin{lstlisting}[style=py]
+$ python -m pdb bilan.py
+> bilan.py(1)<module>()
+(Pdb) b 12            # point d'arrêt ligne 12
+(Pdb) c               # continuer jusqu'au point
+> bilan.py(12)rapport_ventes()
+-> ca = chiffre_affaires(ventes_produit)
+(Pdb) p ventes_produit
+[(1200, 3), (1200, 1)]
+(Pdb) n               # ligne suivante
+(Pdb) q               # quitter
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape La même session que breakpoint(), mais lancée depuis le shell : python -m pdb suivi du nom du script. Les commandes sont identiques.}
+
+\end{frame}
+
+\begin{frame}{Les six pièges classiques}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Piège} & \textbf{\color{PyBleu}Symptôme} & \textbf{\color{PyBleu}Parade} \\
+\midrule
+= au lieu de == & SyntaxError ou affectation surprise & relire la ligne du traceback \\
+Borne de fin de range & un tour de trop ou de moins & tester avec n = 1 \\
+Liste partagée & modifications qui se propagent & copier avec .copy() \\
+Mutable en défaut & paramètre qui accumule entre appels & défaut None puis création \\
+except nu & les bugs disparaissent en silence & attraper un type précis \\
+Indentation trompeuse & une ligne dans le mauvais bloc & afficher les espaces \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Imprimez ce tableau : la moitié des bugs de première année y figure déjà.}
+\end{frame}
+
+\begin{frame}{Écrire du code facile à déboguer}
+\begin{itemize}
+  \item Des fonctions \textbf{courtes} qui font une seule chose
+  \item Des noms qui disent l'intention : `total\_valide` plutôt que `tv`
+  \item Un point d'entrée protégé : les validations à la frontière (séance 11)
+  \item Des asserts pour les invariants : ce qui doit toujours être vrai
+  \item Tester au fil de l'eau plutôt qu'à la fin : chaque séance du TP le démontre
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le parcours en un coup d'oeil}
+\begin{columns}[t]
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Fondations}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item S01 et S02 : algorithmique, conditions, boucles
+  \item S03 et S04 : types, conditions et boucles Python
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Données et fonctions}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item S05 et S06 : listes, tuples, compréhensions, dict, set
+  \item S07 : closures, décorateurs, chaînes, fichiers
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Objets et robustesse}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item S08 et S09 : classes, encapsulation, héritage, dunder
+  \item S10 et S11 : projet bancaire, exceptions
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Et après ? Le Tome 2}
+\begin{itemize}
+  \item \textbf{Modules et paquets} : organiser un projet en plusieurs fichiers
+  \item \textbf{Tests automatisés} : unittest et pytest, la ceinture de sécurité du code
+  \item \textbf{Expressions régulières} : la validation de texte au niveau supérieur
+  \item \textbf{Bases de données} : sqlite3 et la persistance réelle
+  \item \textbf{Algorithmes avancés} : récursivité, complexité, structures de données
+  \item Votre formation de 24 h se poursuit : chaque notion du Tome 1 y est prolongée
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Astuce}
+\begin{exampleblock}{Le journal de bugs}
+Tenez un journal de vos trois derniers bugs : symptôme, cause, correction. Au bout de dix entrées, vos motifs personnels apparaissent : la prévention devient personnelle, et le débogage un réflexe plutôt qu'une corvée.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{Le bilan du Tome 1}
+Vous savez décrire un algorithme, le traduire en Python, organiser les données, écrire des fonctions et des closures, construire des classes qui se parlent et rendre le tout robuste face aux erreurs. La séance 12 ajoute la compétence qui fait la différence en pratique : retrouver et corriger un bug avec méthode. Le Tome 2 vous attend avec les modules, les tests automatisés, les expressions régulières et les bases de données.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Chasse aux bugs et quiz de synthèse}
+TP spécial de fin de formation : deux exercices de débogage, un quiz auto corrigé couvrant les douze séances, et un programme mystère à cinq bugs. Pour les exercices 1 et 3, le squelette CONTIENT le bug : exécutez, observez, corrigez.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Chasse au bug : la moyenne qui ment
+  \item \textbf{Exercice 2 (Basique)} : Écrire ses propres tests
+  \item \textbf{Exercice 3 (Intermédiaire)} : Chasse au bug : le décalage de un
+  \item \textbf{Exercice 4 (Intermédiaire)} : Quiz de synthèse auto corrigé
+  \item \textbf{Exercice 5 (Défi)} : Le programme mystère : cinq bugs
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_12\_debogage\_et\_synthese.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Formation terminée : 24 heures de travail, 12 séances, 60 exercices corrigés. Le Tome 2 du cours prend le relais avec les modules, les tests automatisés, les expressions régulières et les bases de données. À très bientôt !
+\end{exampleblock}
+\end{frame}
+
+\end{document}

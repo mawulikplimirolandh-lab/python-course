@@ -1,0 +1,374 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 01 : Algorithmique et conditions}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 01 : Algorithmique et conditions},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 01\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Penser comme une machine : algorithmique et conditions\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 1 et 2 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Définir ce qu'est un algorithme avec des exemples de la vie courante
+  \item Décrire un traitement en pseudo-code, avant d'écrire la moindre ligne de code
+  \item Utiliser les structures conditionnelles SI, SINON et SINON SI
+  \item Assembler des conditions avec les opérateurs de comparaison et les connecteurs ET, OU, NON
+  \item Préparer le TP de 1 h : cinq exercices progressifs avec corrigés
+\end{itemize}
+\end{frame}
+\begin{frame}{Avant de commencer : ce dont vous avez besoin}
+Cette première séance ne suppose aucune connaissance en programmation. Trois dispositions suffisent pour bien démarrer.
+
+\begin{itemize}
+  \item Un ordinateur avec Python 3 installé pour la partie TP
+  \item De la patience : on réfléchit d'abord, on tape ensuite
+  \item Le Tome 1 du cours sous la main pour approfondir après la séance
+  \item Un cahier pour garder trace de vos essais et de vos erreurs
+\end{itemize}
+\end{frame}
+\begin{frame}{Qu'est-ce qu'un algorithme ?}
+\begin{itemize}
+  \item Une \textbf{suite finie d'instructions} non ambiguës qui transforme des données de départ en résultat
+  \item Exemple quotidien : une recette de cuisine (ingrédients en entrée, plat en sortie, étapes ordonnées)
+  \item Exemple quotidien : monter un meuble avec une notice, faire la lessive, calculer une moyenne
+  \item Un ordinateur exécute très vite, mais \textbf{exactement} ce qu'on lui dit, ni plus ni moins
+  \item Bien programmer, c'est d'abord bien \textbf{décrire} ce que l'on veut obtenir
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Du problème au programme : trois temps}
+\begin{columns}[t]
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}1. Analyser}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Quelles sont les \textbf{entrées} ?
+  \item Quel est le \textbf{résultat} attendu ?
+  \item Quelles règles de calcul s'appliquent ?
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}2. Décrire}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Écrire les étapes en \textbf{pseudo-code}
+  \item Le pseudo-code est du français structuré
+  \item Aucune syntaxe de langage à retenir
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}3. Tester}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Exécuter « à la main » sur un exemple
+  \item Vérifier les cas limites : zéro, négatif, vide
+  \item Corriger puis traduire en Python
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Le pseudo-code : variables et affectation}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Une \textbf{variable} est une boîte étiquetée qui garde une valeur en mémoire
+  \item L'affectation \textbf{reçoit} place une valeur dans la boîte
+\end{itemize}
+\vspace{2pt}
+
+\begin{lstlisting}[style=py]
+ALGO AireDuRectangle
+longueur reçoit 8
+largeur reçoit 5
+aire reçoit longueur fois largeur
+AFFICHER "Aire : ", aire
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape L'affectation n'est pas une égalité mathématique : c'est un rangement.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Entrées, sorties et calculs}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{ENTRER} lit une donnée fournie par l'utilisateur
+  \item \textbf{AFFICHER} montre un résultat à l'écran
+  \item Les calculs suivent les priorités habituelles : fois et divisé avant plus et moins
+  \item Les parenthèses rendent l'ordre explicite
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+ALGO PrixTotal
+ENTRER prix
+ENTRER quantite
+total reçoit prix fois quantite
+total reçoit total plus (total fois 0.18)
+AFFICHER "À payer : ", total
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Les conditions : prendre des décisions}
+\begin{itemize}
+  \item Sans conditions, un programme fait toujours la même chose
+  \item La structure \textbf{SI ... ALORS ... SINON} choisit un chemin selon un test
+  \item Le test produit toujours l'une des deux valeurs : \textbf{vrai} ou \textbf{faux}
+  \item Un seul des deux chemins est exécuté, jamais les deux
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Structure SI / SINON}
+
+\begin{lstlisting}[style=py]
+ALGO AdmisOuNon
+ENTRER note
+SI note >= 10 ALORS
+    AFFICHER "Admis"
+SINON
+    AFFICHER "Ajourné"
+FIN SI
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape L'indentation (le décalage) montre ce qui appartient au SI et ce qui appartient au SINON.}
+
+\end{frame}
+
+\begin{frame}{Les opérateurs de test}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Opérateur} & \textbf{\color{PyBleu}Signification} & \textbf{\color{PyBleu}Exemple avec x = 7} \\
+\midrule
+= & égal à & x = 7 est vrai \\
+!= & différent de & x != 3 est vrai \\
+< & strictement inférieur & x < 7 est faux \\
+<= & inférieur ou égal & x <= 7 est vrai \\
+> & strictement supérieur & x > 0 est vrai \\
+>= & supérieur ou égal & x >= 10 est faux \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Connecteurs : ET (les deux tests vrais), OU (au moins un vrai), NON (inverse le résultat).}
+\end{frame}
+
+\begin{frame}[fragile]{Conditions imbriquées et SINON SI}
+
+\begin{lstlisting}[style=py]
+ALGO MentionSelonNote
+ENTRER note
+SI note >= 16 ALORS
+    AFFICHER "Très bien"
+SINON SI note >= 14 ALORS
+    AFFICHER "Bien"
+SINON SI note >= 10 ALORS
+    AFFICHER "Passable"
+SINON
+    AFFICHER "Insuffisant"
+FIN SI
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Les tests se lisent de haut en bas : le premier qui est vrai gagne, les autres sont ignorés.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Assembler des conditions avec ET, OU}
+
+\begin{lstlisting}[style=py]
+ALGO AccesAutorise
+ENTRER age
+ENTRER carteValide
+SI age >= 18 ET carteValide = vrai ALORS
+    AFFICHER "Accès autorisé"
+SINON
+    AFFICHER "Accès refusé"
+FIN SI
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Il n'y a aucun besoin de tester age deux fois : un seul SI bien écrit suffit.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Un premier pont vers Python}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item SI se traduit par \textbf{if}, SINON par \textbf{else}
+  \item Les deux points ouvrent un bloc
+  \item L'\textbf{indentation} de 4 espaces remplace le FIN SI
+  \item Vous verrez cela en détail à la séance 04
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+note = 13
+if note >= 10:
+    print("Admis")
+else:
+    print("Ajourné")
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Les pièges du débutant}
+Confondre le test d'égalité (= en pseudo-code, == en Python) avec l'affectation. Oublier le cas SINON alors qu'il faut une réponse dans tous les cas. Écrire des conditions dans un ordre tel qu'un test trop général masque les tests suivants. Vérifiez toujours votre algorithme à la main sur deux ou trois exemples.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 01}
+Un algorithme est une suite d'instructions finie et non ambiguë. On analyse, puis on décrit en pseudo-code, puis on teste à la main avant de coder. Les structures SI, SINON et SINON SI permettent de prendre des décisions ; les connecteurs ET, OU, NON les combinent. Cette discipline de pensée vaut pour tous les langages.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Algorithmique et premières conditions}
+Dans ce premier TP, vous écrirez d'abord des algorithmes en pseudo-code sur papier, puis vous les traduirez en Python directement dans le notebook. L'objectif est de verrouiller la logique de décision.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Périmètre et aire d'un rectangle
+  \item \textbf{Exercice 2 (Basique)} : Pair ou impair
+  \item \textbf{Exercice 3 (Intermédiaire)} : Trier trois nombres sans sorted()
+  \item \textbf{Exercice 4 (Intermédiaire)} : Calculateur de mention
+  \item \textbf{Exercice 5 (Défi)} : Année bissextile
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_01\_penser\_comme\_une\_machine.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 02 : les boucles. Nous apprendrons à répéter des instructions proprement avec TANT QUE et POUR, à compter, à accumuler et à écrire nos premiers vrais algorithmes. Relisez les opérateurs de test du Tome 1, ils serviront partout.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

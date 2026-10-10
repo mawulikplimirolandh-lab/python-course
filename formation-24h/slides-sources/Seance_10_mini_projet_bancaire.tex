@@ -1,0 +1,356 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 10 : Mini-projet bancaire}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 10 : Mini-projet bancaire},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 10\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Mini-projet guidé : un système bancaire à trois classes\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitre 19 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Lire un cahier des charges et en déduire les classes nécessaires
+  \item Faire dialoguer des objets entre eux (Client, Compte, Banque)
+  \item Centraliser les validations et préparer les exceptions métier
+  \item Conserver une trace des opérations : l'historique de transactions
+  \item Produire un rapport lisible depuis les données des objets
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel des séances 08 et 09}
+Le projet assemble tout : encapsulation de la séance 08, méthodes spéciales de la séance 09, et deux séances de préparation pour rien d'autre que bâtir.
+
+\begin{itemize}
+  \item \_\_init\_\_, self, attributs d'instance et de classe
+  \item \_interne et \_\_privé, @property avec setter validant
+  \item @classmethod pour les fabriques, \_\_str\_\_ pour la présentation
+  \item super() et l'héritage quand la relation EST UN est vraie
+  \item \_\_len\_\_ et \_\_getitem\_\_ pour transformer une classe en conteneur
+\end{itemize}
+\end{frame}
+\begin{frame}{Le cahier des charges}
+\begin{columns}[t]
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Le Client}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Un numéro unique et un nom
+  \item Peut détenir plusieurs comptes
+  \item Se présente proprement (\_\_str\_\_)
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Le Compte}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Un solde jamais modifiable de l'extérieur
+  \item Dépôt, retrait avec validation
+  \item Un historique de toutes les opérations
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}La Banque}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Ouvre les comptes et les numérote
+  \item Effectue les virements entre comptes
+  \item Édite le rapport général
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Architecture : qui connaît qui ?}
+
+\begin{lstlisting}[style=py]
+# La Banque détient les comptes ; le Client est référencé
+banque = Banque()
+compte = banque.ouvrir_compte("Awa", 1000)
+banque.ouvrir_compte("Kofi", 250)
+
+banque.virer(compte.numero, cible_numero, 400)
+print(banque.rapport())
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Règle d'or : chaque classe ne connaît que ses attributs. La Banque orchestre ; le Compte n'appelle jamais la Banque.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Étape 1 : la classe Client}
+
+\begin{lstlisting}[style=py]
+class Client:
+    def __init__(self, numero, nom):
+        self.numero = numero
+        self.nom = nom
+
+    def __str__(self):
+        return f"Client {self.numero} : {self.nom}"
+
+awa = Client(1, "Awa")
+print(awa)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Pas de logique, pas de validation complexe : le Client est une fiche d'identité. La simplicité d'une classe se juge à ce qu'elle refuse de faire.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Étape 2 : le Compte et son historique}
+
+\begin{lstlisting}[style=py]
+class Compte:
+    def __init__(self, numero, client, solde=0):
+        self.numero = numero
+        self.client = client
+        self._solde = solde
+        self.historique = [f"Ouverture : {solde} F"]
+
+    def deposer(self, montant):
+        if montant <= 0:
+            raise ValueError("montant invalide")
+        self._solde += montant
+        self.historique.append(f"Dépôt : +{montant} F")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Chaque opération validée laisse une trace : l'historique est le fil d'audit du compte. La séance 11 transformera ces ValueError en exceptions métier.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Étape 3 : la Banque orchestre}
+
+\begin{lstlisting}[style=py]
+class Banque:
+    def __init__(self):
+        self.comptes = {}
+        self.prochain_numero = 1
+    def ouvrir_compte(self, nom, solde=0):
+        client = Client(self.prochain_numero, nom)
+        compte = Compte(self.prochain_numero, client, solde)
+        self.comptes[compte.numero] = compte
+        self.prochain_numero += 1
+        return compte
+    def virer(self, source, cible, montant):
+        depart = self.comptes[source]
+        arrivee = self.comptes[cible]
+        depart.retirer(montant)
+        arrivee.deposer(montant)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape virer appelle retirer PUIS deposer : si retirer lève une exception, rien n'a été déposé. L'ordre des opérations est une décision de sécurité.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Le rapport : objets en texte}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Le rapport parcourt tous les comptes
+  \item Chaque compte fournit sa ligne via \_\_str\_\_ ou une méthode resume()
+  \item La Banque ajoute les totaux globaux
+  \item Les f-strings alignent les colonnes : rappel de la séance 03
+  \item Un bon rapport se lit sans avoir ouvert le code
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+def rapport(self):
+    lignes = ["Rapport de la banque"]
+    total = 0
+    for compte in self.comptes.values():
+        lignes.append(str(compte))
+        total += compte.solde
+    lignes.append(f"Total : {total} F")
+    return "\n".join(lignes)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Étape 4 : virement par numéros}
+
+\begin{lstlisting}[style=py]
+class Banque:
+    def virer_par_numeros(self, source, cible, montant):
+        depart = self.compte(source)      # KeyError si inconnu
+        arrivee = self.compte(cible)
+        return virer(depart, arrivee, montant)
+
+b = Banque()
+c1 = b.ouvrir_compte("Awa", 1000)
+c2 = b.ouvrir_compte("Kofi", 250)
+b.virer_par_numeros(1, 2, 400)
+print(c1.solde, c2.solde)   # 600 650
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape La Banque traduit les numéros en objets puis réutilise le virement déjà validé : chaque couche ne fait qu'un travail, le sien.}
+
+\end{frame}
+
+\begin{frame}{Étendre le projet : les pistes}
+\begin{itemize}
+  \item \textbf{Intérêts} : une méthode `appliquer\_interets(taux)` sur les comptes créditeurs
+  \item \textbf{Découvert autorisé} : un plafond par compte, vérifié au retrait
+  \item \textbf{Exceptions métier} : CompteInconnuError, SoldeInsuffisantError (séance 11)
+  \item \textbf{Persistance} : sauvegarder les comptes dans un fichier (séance 07)
+  \item \textbf{Tests} : chaque règle du cahier des charges devient un assert
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Astuce}
+\begin{exampleblock}{Avancer par tests, pas par espoir}
+Après CHAQUE étape du TP, exécutez les cellules de vérification de toutes les étapes précédentes : si une ancienne étape casse, vous le savez immédiatement, pas à la fin. C'est le réflexe des tests automatisés que le Tome 2 systématisera avec unittest.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Ne contournez pas les méthodes}
+Dans le rapport, écrire `compte.\_solde` fonctionne mais casse l'encapsulation : si demain le solde devient calculé (solde + découvert), le rapport mentira. Utilisez toujours l'interface publique : `compte.solde` via @property, et les méthodes validées. La discipline d'aujourd'hui évite le bug de demain.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 10}
+Un mini projet se construit par étapes : une classe fiche (Client), une classe métier validée (Compte), un orchestrateur (Banque). Les classes se parlent par méthodes publiques uniquement, chaque opération laisse une trace, et le rapport assemble les présentations individuelles. Ce squelette à trois classes s'adapte à la bibliothèque, au stock ou au carnet de notes.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Projet guidé : la banque complète}
+Le TP EST le projet : vous bâtirez la banque entière en cinq étapes, dans l'ordre. Chaque étape repose sur la précédente ; les tests de chaque exercice valident l'étape en cours. Les numéros de compte vont de 1 à 3 dans les tests.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Étape 1 : la classe Client
+  \item \textbf{Exercice 2 (Intermédiaire)} : Étape 2 : la classe Compte avec historique
+  \item \textbf{Exercice 3 (Intermédiaire)} : Étape 3 : les virements
+  \item \textbf{Exercice 4 (Intermédiaire)} : Étape 4 : la classe Banque
+  \item \textbf{Exercice 5 (Défi)} : Étape 5 : intérêts et rapport mensuel
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_10\_mini\_projet\_bancaire.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 11 : les exceptions. Vos ValueError et KeyError deviennent des exceptions métier nommées, attrapables et documentées. Relisez le traceback de toute erreur levée dans ce TP : savoir le lire est la moitié du chemin.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

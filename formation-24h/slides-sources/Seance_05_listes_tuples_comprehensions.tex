@@ -1,0 +1,364 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 05 : Listes, tuples et compréhensions}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 05 : Listes, tuples et compréhensions},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 05\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Listes, tuples et compréhensions\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitres 9 et 10 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Créer, lire et modifier des listes avec index, slices et méthodes
+  \item Parcourir une liste avec for, enumerate et le test d'appartenance in
+  \item Distinguer les tuples, figés une fois pour toutes, et leurs usages
+  \item Écrire des compréhensions de listes simples, filtrées et imbriquées
+  \item Éviter le piège de la copie de liste partagée
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 04}
+Les listes sont le premier conteneur du cours : une seule variable pour ranger toute une série, parcourue par les boucles que vous maîtrisez déjà.
+
+\begin{itemize}
+  \item if, elif, else : les décisions en Python et l'indentation structurante
+  \item and, or, not : les connecteurs logiques
+  \item while et for : les deux boucles, break et continue
+  \item range(a, b) compte de a à b moins 1 : la borne de fin est exclue
+  \item Une comparaison produit un bool : c'est le carburant des filtres
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Créer et lire une liste}
+
+\begin{lstlisting}[style=py]
+notes = [12, 15, 9, 18]
+print(notes[0])      # 12  premier élément
+print(notes[-1])     # 18  dernier élément
+print(notes[1:3])    # [15, 9]  slice : borne de fin exclue
+print(len(notes))    # 4
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Les index démarrent à 0. Les index négatifs comptent depuis la fin : notes[-1] est le dernier.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Modifier une liste : les méthodes clés}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item `append(x)` : ajoute à la fin
+  \item `insert(i, x)` : insère à la position i
+  \item `remove(x)` : retire la première occurrence de x
+  \item `pop(i)` : retire et \textbf{retourne} l'élément à l'index i
+  \item `sort()` et `reverse()` : rangent la liste \textbf{sur place}
+  \item `in` : teste l'appartenance, renvoie un bool
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+panier = ["riz", "huile"]
+panier.append("sucre")
+panier.insert(0, "pain")
+panier.remove("huile")
+dernier = panier.pop()
+print(panier, dernier)
+print("riz" in panier)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Parcourir : for, enumerate}
+
+\begin{lstlisting}[style=py]
+notes = [12, 15, 9]
+for n in notes:
+    print(n)
+
+for i, n in enumerate(notes):
+    print(f"Élément {i} : {n}")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Préférez le parcours direct for n in notes à la manipulation d'index. enumerate fournit la position quand elle est vraiment utile.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Le tuple : une liste figée}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Parenthèses au lieu de crochets : (3, 5)
+  \item \textbf{Immuables} : impossible de modifier un élément
+  \item Ideal pour un résultat composé : (somme, moyenne)
+  \item Unpacking : `a, b = point` déplie le tuple en deux variables
+  \item Retourner plusieurs valeurs d'une fonction : c'est un tuple
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+point = (3, 5)
+x, y = point          # unpacking
+print(x + y)
+
+def stats(notes):
+    return (min(notes), max(notes))
+mini, maxi = stats([7, 9, 14])
+print(mini, maxi)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{La compréhension de liste : l'idée}
+\begin{itemize}
+  \item Un motif ultra courant : créer une liste en transformant une autre suite
+  \item Version classique : boucle for + append, trois lignes
+  \item La compréhension tient en \textbf{une seule ligne lisible}
+  \item `[expression for element in suite]`
+  \item Python exécute exactement la même chose, mais le code dit l'essentiel en premier
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Boucle classique contre compréhension}
+
+\begin{lstlisting}[style=py]
+# Version classique
+cubes = []
+for k in range(1, 6):
+    cubes.append(k ** 3)
+
+# Même résultat en compréhension
+cubes = [k ** 3 for k in range(1, 6)]
+print(cubes)   # [1, 8, 27, 64, 125]
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape On lit de gauche à droite : « le cube de k, pour k allant de 1 à 5 ». L'ordre d'écriture suit l'ordre de lecture du résultat.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Compréhension avec condition}
+
+\begin{lstlisting}[style=py]
+notes = [12, 15, 9, 18, 8, 14]
+
+admis = [n for n in notes if n >= 10]
+print(admis)          # [12, 15, 18, 14]
+
+recales = [n for n in notes if n < 10]
+print(recales)        # [9, 8]
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le `if` en fin de compréhension filtre : seuls les éléments qui passent le test entrent dans la liste.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Transformer et filtrer en même temps}
+
+\begin{lstlisting}[style=py]
+prix_ht = [100, 250, 40, 999]
+
+prix_ttc = [round(p * 1.18, 2) for p in prix_ht]
+print(prix_ttc)
+
+gros_montants = [p * 1.18 for p in prix_ht if p >= 100]
+print(gros_montants)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape L'expression de gauche peut calculer (arrondi, conversion) pendant que le if de droite filtre : les deux rôles sont séparés.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Compréhensions imbriquées}
+
+\begin{lstlisting}[style=py]
+matrice = [[1, 2, 3],
+           [4, 5, 6]]
+ligne_plate = [v for ligne in matrice for v in ligne]
+print(ligne_plate)    # [1, 2, 3, 4, 5, 6]
+
+carrees = [(x, y) for x in range(3) for y in range(3)]
+print(len(carrees))   # 9
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Deux for se lisent comme deux boucles imbriquées : le for de droite est la boucle interne. L'ordre des clauses est celui des boucles.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Le piège de la copie}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item `b = a` ne copie \textbf{pas} la liste : les deux noms pointent vers le même objet
+  \item Modifier b modifie a : surprise garantie
+  \item Copie superficielle : `b = a.copy()` ou `b = list(a)` ou `b = a[:]`
+  \item Vérification : `a is b` dit si les deux noms désignent le même objet
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+a = [1, 2, 3]
+b = a               # même objet !
+b.append(4)
+print(a)            # [1, 2, 3, 4]
+
+c = a.copy()        # vraie copie
+c.append(99)
+print(a, c)
+print(a is b, a is c)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{IndexError et slices}
+`notes[10]` sur une liste de 4 éléments lève `IndexError` : l'index doit être strictement inférieur à la longueur. Étrangement, le slice `notes[10:20]` ne lève aucune erreur et retourne une liste vide. Rappel : `range(len(notes))` donne les index valides, mais le parcours direct `for n in notes` reste plus sûr.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 05}
+Une liste se parcourt directement et se modifie sur place avec append, insert, remove et pop. Le tuple fige des valeurs liées et sert à retourner plusieurs résultats. La compréhension de liste résume transformation et filtrage en une ligne : expression, for, condition. Et souvenez vous : affecter une liste à un second nom ne la copie pas.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Listes, tuples et compréhensions}
+Du panier de courses au nettoyage de données imbriquées : cinq exercices pour faire de la compréhension de liste un réflexe. Pour les exercices 2 à 5, une solution en une ligne de compréhension est attendue quand c'est possible.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Panier de courses
+  \item \textbf{Exercice 2 (Basique)} : Carrés et cubes en compréhension
+  \item \textbf{Exercice 3 (Intermédiaire)} : Filtrer les notes admises
+  \item \textbf{Exercice 4 (Intermédiaire)} : Transposée d'une matrice
+  \item \textbf{Exercice 5 (Défi)} : Nettoyage de données imbriquées
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_05\_listes\_tuples\_comprehensions.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 06 : dictionnaires et ensembles pour organiser les données par clé, puis les fonctions pour organiser le code. Relisez le piège de la copie : il réapparaît avec les dictionnaires, exactement de la même façon.
+\end{exampleblock}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,362 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+
+% ================= Palette (identique au livre Tome 1) =================
+\definecolor{PyBleu}{HTML}{1A4A7A}
+\definecolor{PyBleuMoyen}{HTML}{2D7AB3}
+\definecolor{PyBleuClair}{HTML}{EAF1F8}
+\definecolor{PyJaune}{HTML}{FFD43B}
+\definecolor{PyNuit}{HTML}{142840}
+\definecolor{PyTexte}{HTML}{1F2A37}
+\definecolor{PyGris}{HTML}{5A6B7E}
+\definecolor{PyRouge}{HTML}{B3442D}
+\definecolor{PyVert}{HTML}{2E7D5B}
+\definecolor{CodeTexte}{HTML}{E8EEF6}
+
+% ================= Code Python =================
+\lstdefinestyle{py}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\footnotesize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=6pt,
+  framexleftmargin=6pt,
+}
+\lstdefinestyle{pysmall}{
+  language=Python,
+  keywordstyle=\color{PyJaune}\bfseries,
+  stringstyle=\color{PyJaune},
+  commentstyle=\color{PyGris}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  backgroundcolor=\color{PyNuit},
+  basicstyle=\ttfamily\scriptsize\color{CodeTexte},
+  columns=fullflexible,
+  keepspaces=true,
+  xleftmargin=5pt,
+  framexleftmargin=5pt,
+}
+
+% ================= Titres de diapositives =================
+\setbeamercolor{structure}{fg=PyBleu}
+\setbeamerfont{frametitle}{series=\bfseries, size=\Large}
+\setbeamercolor{frametitle}{bg=PyBleu, fg=white}
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\textwidth, ht=2.1ex, dp=0.9ex,
+                          leftskip=0.35cm, rightskip=0.35cm]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle%
+  \end{beamercolorbox}%
+  \vspace*{-0.4pt}%
+  {\color{PyJaune}\rule{\textwidth}{1.6pt}}%
+}
+
+% ================= Pied de page =================
+\setbeamerfont{footline}{size=\tiny}
+\setbeamercolor{footline}{bg=white, fg=PyGris}
+\newcommand{\PiedDePage}{Python en 24 heures \textbar\ Séance 11 : Erreurs et exceptions}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth, ht=2.2ex, dp=1.1ex,
+                            leftskip=0.35cm, rightskip=0.35cm]{footline}%
+      \usebeamerfont{footline}\PiedDePage
+      \hfill\insertframenumber\,/\,\inserttotalframenumber%
+    \end{beamercolorbox}}%
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\color{PyBleuMoyen}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{PyBleuMoyen}\textbullet}
+
+% ================= Blocs pedagogiques =================
+\setbeamercolor{block title}{bg=PyBleu, fg=white}
+\setbeamercolor{block body}{bg=PyBleuClair, fg=PyTexte}
+\setbeamercolor{block title alerted}{bg=PyRouge, fg=white}
+\setbeamercolor{block body alerted}{bg=PyRouge!9, fg=PyTexte}
+\setbeamercolor{block title example}{bg=PyJaune, fg=PyNuit}
+\setbeamercolor{block body example}{bg=PyJaune!14, fg=PyTexte}
+
+% ================= Metadonnees =================
+\hypersetup{
+  pdftitle={Python en 24 heures : Séance 11 : Erreurs et exceptions},
+  pdfauthor={HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou},
+  pdfsubject={De l'algorithmique à la programmation orientée objet},
+  pdfkeywords={Python, algorithmique, POO, formation, exercices corrigés}
+}
+
+\begin{document}
+
+{%
+\setbeamercolor{background canvas}{bg=PyNuit}
+\begin{frame}[plain]
+\vspace{10mm}
+{\color{PyJaune}\small\bfseries FORMATION « PYTHON EN 24 HEURES » \quad\textbar\quad SÉANCE 11\par}
+\vspace{4mm}
+{\color{white}\Huge\bfseries Erreurs et exceptions : écrire du code robuste\par}
+\vspace{4mm}
+{\color{PyBleuClair}\large Chapitre 20 du Tome 1\par}
+\vspace{7mm}
+{\color{PyJaune}\rule{34mm}{2.2pt}\par}
+\vspace{7mm}
+{\color{white}\normalsize 1 h de cours (présentation Beamer) \quad$\bullet$\quad 1 h de pratique (notebook Jupyter)\par}
+\vspace{2.5mm}
+{\color{PyBleuClair}\normalsize HOUNKPE Mawulikplimi Roland et DJABON Ounimborbitibou\par}
+\end{frame}
+}
+\begin{frame}{Objectifs de la séance}
+\begin{itemize}
+  \item Classer les erreurs en trois familles : syntaxe, exécution, logique
+  \item Lire un traceback de bas en haut pour localiser la cause
+  \item Protéger un traitement avec try, except, else et finally
+  \item Lever des exceptions utiles avec raise et créer ses propres classes d'erreurs
+  \item Adopter la philosophie EAFP face à LBYL
+\end{itemize}
+\end{frame}
+\begin{frame}{Rappel de la séance 10}
+Dans le mini projet, les validations lèvaient déjà ValueError et KeyError : cette séance les transforme en véritable système de gestion d'erreurs.
+
+\begin{itemize}
+  \item Trois classes qui se parlent : Client, Compte, Banque
+  \item Validations : jamais de solde négatif, jamais de virement douteux
+  \item L'historique comme fil d'audit de chaque compte
+  \item super() et composition pour assembler les objets
+  \item Le rapport : assembler des \_\_str\_\_ en texte lisible
+\end{itemize}
+\end{frame}
+\begin{frame}{Trois familles d'erreurs}
+\begin{columns}[t]
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Erreurs de syntaxe}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Détectées AVANT l'exécution
+  \item Deux points oublié, parenthèse non fermée
+  \item Python refuse de démarrer
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Erreurs d'exécution}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item La syntaxe est bonne, le plantage vient en cours de route
+  \item ZeroDivisionError, TypeError, KeyError
+  \item Ce sont les \textbf{exceptions} de cette séance
+\end{itemize}
+\end{column}
+\hspace{0.015\textwidth}
+\begin{column}{0.315\textwidth}
+{\bfseries\color{PyBleu}Erreurs logiques}
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Le programme tourne mais donne un faux résultat
+  \item Python ne peut rien voir : seul le test détecte
+  \item Chasse dédiée à la séance 12
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Lire un traceback de bas en haut}
+
+\begin{lstlisting}[style=py]
+def moyenne(notes):
+    return sum(notes) / len(notes)
+
+def rapport(notes):
+    return f"Moyenne : {moyenne(notes):.2f}"
+
+rapport([])
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le dernier ligne du traceback nomme l'exception : ZeroDivisionError. Les lignes au dessus remontent le chemin de l'appel : lisez les de bas en haut.}
+
+\end{frame}
+
+\begin{frame}{Les exceptions courantes}
+\renewcommand{\arraystretch}{1.3}\small
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{\color{PyBleu}Exception} & \textbf{\color{PyBleu}Cause typique} & \textbf{\color{PyBleu}Exemple} \\
+\midrule
+NameError & nom jamais défini & variable mal orthographiée \\
+TypeError & opération entre types incompatibles & "a" + 5 \\
+ValueError & type bon, valeur inacceptable & int("douze") \\
+IndexError & index hors bornes & liste[10] sur 4 éléments \\
+KeyError & clé absente du dict & dico["inconnue"] \\
+ZeroDivisionError & division par zéro & x / 0 \\
+FileNotFoundError & fichier introuvable & open("nrf.txt") \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{4pt}
+
+{\small\color{PyGris}Notez la hiérarchie : toutes héritent d'Exception. TypeError et ValueError se distinguent par la nature du problème : type ou valeur.}
+\end{frame}
+
+\begin{frame}[fragile]{try / except : intercepter}
+
+\begin{lstlisting}[style=py]
+try:
+    nombre = int("douze")
+    print("Conversion réussie")
+except ValueError:
+    print("Ce n'est pas un nombre valide")
+
+print("Le programme continue normalement")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Le bloc try tente l'opération ; si l'exception annoncée survient, le bloc except la traite et l'exécution repart après le bloc : plus aucun plantage.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Plusieurs except et le mot clé as}
+\begin{columns}[t]
+\begin{column}{0.42\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item Un try peut annoncer plusieurs except, du plus spécifique au plus général
+  \item `as e` récupère l'objet exception pour l'analyser
+  \item Un except nu (sans type) attrape TOUT : à proscrire, il masque les vrais bugs
+  \item Exception comme filet final, jamais en première ligne
+\end{itemize}
+\end{column}
+\hspace{0.02\textwidth}
+\begin{column}{0.55\textwidth}
+\begin{lstlisting}[style=pysmall]
+try:
+    valeur = int("3x") / 0
+except ValueError as e:
+    print("Valeur fausse :", e)
+except ZeroDivisionError as e:
+    print("Division interdite :", e)
+except Exception as e:
+    print("Autre incident :", type(e).__name__)
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{else et finally : le protocole complet}
+
+\begin{lstlisting}[style=py]
+try:
+    fichier = open("data.txt", "r")
+except FileNotFoundError:
+    print("Fichier absent")
+else:
+    print(fichier.read())
+    fichier.close()
+finally:
+    print("Passage garanti, erreur ou non")
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape else s'exécute seulement si aucun incident ; finally s'exécute TOUJOURS : libération de ressource, message d'audit, nettoyage.}
+
+\end{frame}
+
+\begin{frame}[fragile]{raise : lever à bon escient}
+
+\begin{lstlisting}[style=py]
+def fixer_age(age):
+    if not isinstance(age, int):
+        raise TypeError("l'âge doit être un entier")
+    if age < 0:
+        raise ValueError("l'âge ne peut pas être négatif")
+    return age
+
+fixer_age(-3)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape raise interrompt la fonction et remonte l'incident à l'appelant : les validations des séances précédentes étaient déjà des raise.}
+
+\end{frame}
+
+\begin{frame}{EAFP contre LBYL}
+\begin{itemize}
+  \item \textbf{LBYL} : Look Before You Leap. Tester avant d'agir : `if "cle" in d: ...`
+  \item \textbf{EAFP} : Easier to Ask Forgiveness than Permission. Agir puis réparer : `try: ... except KeyError: ...`
+  \item La culture Python privilégie EAFP : le cas normal lit sans test superflu
+  \item EAFP évite les conditions de course et les doubles lectures
+  \item Choisir selon la lisibilité : un try propre vaut trois tests imbriqués
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exceptions personnalisées}
+
+\begin{lstlisting}[style=py]
+class SoldeInsuffisantError(Exception):
+    """Levée quand un retrait dépasse le solde."""
+    pass
+
+def retirer(solde, montant):
+    if montant > solde:
+        raise SoldeInsuffisantError(
+            f"retrait de {montant} pour un solde de {solde}")
+    return solde - montant
+
+try:
+    retirer(100, 500)
+except SoldeInsuffisantError as e:
+    print("Refusé :", e)
+\end{lstlisting}
+\vspace{0.5pt}
+
+{\small\color{PyGris}\itshape Une classe qui hérite d'Exception suffit. Un nom métier parle plus fort que ValueError générique : le code appelant attrape exactement ce qu'il attend.}
+
+\end{frame}
+
+\begin{frame}{Attention}
+\begin{alertblock}{Le except nu masque les bugs}
+`except:` sans type attrape aussi KeyboardInterrupt et les erreurs de syntaxe dynamique : votre programme continue dans un état incohérent. Attrapez toujours le type le plus précis possible, et terminez vos chaînes par `except Exception as e` explicitement loggué si vous devez vraiment tout couvrir.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{À retenir}
+\begin{block}{L'essentiel de la séance 11}
+Les exceptions transforment un plantage en message exploitable. try protège, except traite du plus spécifique au plus général, else confirme le succès, finally nettoie toujours. raise signale une règle métier bafouée ; vos propres classes d'Exception nomment ces règles. EAFP : agir, puis réparer, est l'idiome Python.
+\end{block}
+\end{frame}
+
+\begin{frame}{Travaux pratiques (1 h) : Exceptions et code robuste}
+Cinq exercices pour rendre vos programmes inplantables : interception, conversion sûre, exception métier, fichier protégé et validateur de données. Les cellules de vérification de cette séance SONT des exemples de try/except bien écrits : inspirez vous en.
+
+\begin{itemize}
+  \setlength{\itemsep}{1.5pt}\setlength{\parskip}{0pt}
+  \item \textbf{Exercice 1 (Basique)} : Division sécurisée
+  \item \textbf{Exercice 2 (Basique)} : Conversion robuste avec valeur de secours
+  \item \textbf{Exercice 3 (Intermédiaire)} : Compte bancaire avec exception métier
+  \item \textbf{Exercice 4 (Intermédiaire)} : Lecture de fichier robuste avec finally
+  \item \textbf{Exercice 5 (Défi)} : Validateur de données CSV
+\end{itemize}
+\vspace{4pt}
+
+{\small\color{PyGris}Ouvrez le notebook « Seance\_11\_erreurs\_et\_exceptions.ipynb » pour commencer.}
+\end{frame}
+\begin{frame}{Pour la prochaine séance}
+\begin{exampleblock}{Conseil de travail}
+Séance 12 : débogage et synthèse. Nous chasserons les erreurs logiques avec la méthode en quatre temps, print instrumenté, assert et breakpoint(). Relisez le tableau des exceptions de cette séance : le quiz final vous interrogera dessus.
+\end{exampleblock}
+\end{frame}
+
+\end{document}
