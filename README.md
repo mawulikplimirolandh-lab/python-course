@@ -67,8 +67,8 @@ Chaque séance = **1 h de cours** (diapositives Beamer) + **1 h de pratique**
 | 11 | Erreurs et exceptions | ✅ | ✅ |
 | 12 | Débogage et synthèse | ✅ | ✅ |
 
-🎥 **Vidéos** : les séances 01 et 02 sont disponibles en vidéo MP4 720 p
-(narration française native, sous-titres incrustés, ~9 min chacune).
+🎥 **Vidéos** : les séances 01, 02 et 03 sont disponibles en vidéo MP4 720 p
+(narration française native, sous-titres incrustés, ~8 à 10 min chacune).
 Chaque vidéo s'ouvre sur une carte « Likez + Abonnez-vous ».
 Les suivantes suivront le même format, une par une.
 
