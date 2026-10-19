@@ -21,7 +21,8 @@ python-course/
 │   ├── slides/               12 présentations Beamer (PDF)
 │   ├── slides-sources/       12 sources LaTeX (.tex)
 │   ├── notebooks/            12 notebooks Jupyter (.ipynb)
-│   └── videos/               Vidéos des séances (MP4 sous-titré)
+│   ├── videos/               Vidéos des séances (MP4 sous-titré)
+│   └── atelier/              Quiz pratiques (support PDF)
 │
 └── packs/
     └── Pack_Complet_Python_24h.zip     Tout le pack en un seul fichier
@@ -71,6 +72,13 @@ Chaque séance = **1 h de cours** (diapositives Beamer) + **1 h de pratique**
 (narration française native, sous-titres incrustés, ~8 à 10 min chacune).
 Chaque vidéo s'ouvre sur une carte « Likez + Abonnez-vous ».
 Les suivantes suivront le même format, une par une.
+
+🎮 **Atelier pratique** : en plus du cours, la séance 03 dispose d'un
+**quiz vidéo interactif** (`videos/Seance_03_atelier_pratique_quiz.mp4`)
+et de son support PDF (`atelier/Seance_03_atelier_pratique_slides.pdf`) :
+7 défis « devinez la sortie » pour ancrer int, float, str, bool,
+les conversions et les f-strings, avec score sur 7 et mini-projet bonus.
+Idéal pour tester ses connaissances après la séance.
 
 ---
 
